@@ -1,5 +1,9 @@
 const express = require('express');
+const axios = require('axios');
 const app = express();
+
+const TMDB_API_KEY = '591d3d2beca9f7f746e95deab4f78893';
+const TMDB_URL = 'https://api.themoviedb.org/3/movie';
 
 const manifest = {
   "id": "com.colecoes.nuvio",
@@ -42,8 +46,31 @@ app.get('/catalog/:type/:id.json', (req, res) => {
   res.json({ metas: coll });
 });
 
-app.get('/meta/:type/:id.json', (req, res) => {
-  res.json({ meta: {} });
+app.get('/meta/:type/:id.json', async (req, res) => {
+  const id = req.params.id.replace('tmdb:', '');
+  try {
+    const data = await axios.get(`${TMDB_URL}/${id}`, {
+      params: { api_key: TMDB_API_KEY }
+    });
+    res.json({
+      meta: {
+        id: `tmdb:${data.data.id}`,
+        type: "movie",
+        name: data.data.title,
+        year: data.data.release_date?.split('-')[0],
+        poster: `https://image.tmdb.org/t/p/w500${data.data.poster_path}`,
+        background: `https://image.tmdb.org/t/p/w500${data.data.backdrop_path}`,
+        description: data.data.overview,
+        runtime: data.data.runtime
+      }
+    });
+  } catch (err) {
+    res.json({ meta: {} });
+  }
+});
+
+app.get('/stream/:type/:id', (req, res) => {
+  res.json({ streams: [] });
 });
 
 const port = process.env.PORT || 3000;
