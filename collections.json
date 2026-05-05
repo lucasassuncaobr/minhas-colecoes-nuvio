@@ -1,0 +1,29 @@
+{
+  "collections": {
+    "poderoso-chefão": {
+      "name": "Poderoso Chefão Saga Completa",
+      "description": "Trilogia + Coda",
+      "movies": [
+        {"title": "The Godfather", "year": 1972, "tmdbId": 238},
+        {"title": "The Godfather Part II", "year": 1974, "tmdbId": 239},
+        {"title": "The Godfather Part III", "year": 1990, "tmdbId": 240},
+        {"title": "The Godfather Coda: The Death of Michael Corleone", "year": 2020, "tmdbId": 490}
+      ]
+    },
+    "rocky": {
+      "name": "Franquia Rocky + Creed",
+      "description": "9 filmes principais",
+      "movies": [
+        {"title": "Rocky", "year": 1976, "tmdbId": 519},
+        {"title": "Rocky II", "year": 1979, "tmdbId": 520},
+        {"title": "Rocky III", "year": 1982, "tmdbId": 521},
+        {"title": "Rocky IV", "year": 1985, "tmdbId": 615},
+        {"title": "Rocky V", "year": 1990, "tmdbId": 786},
+        {"title": "Rocky Balboa", "year": 2006, "tmdbId": 8563},
+        {"title": "Creed", "year": 2015, "tmdbId": 337401},
+        {"title": "Creed II", "year": 2018, "tmdbId": 398949},
+        {"title": "Creed III", "year": 2023, "tmdbId": 958028}
+      ]
+    }
+  }
+}
