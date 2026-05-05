@@ -1,0 +1,22 @@
+{
+  "id": "com.colecoes.nuvio",
+  "name": "Coleções Rocky e Godfather",
+  "description": "Coleções MDBList para Nuvio",
+  "version": "1.0.0",
+  "resources": ["catalog", "meta"],
+  "types": ["movie"],
+  "catalogs": [
+    {
+      "type": "movie",
+      "id": "godfather-collection",
+      "name": "Poderoso Chefão",
+      "extra": [{"name": "search", "isRequired": false}]
+    },
+    {
+      "type": "movie",
+      "id": "rocky-collection",
+      "name": "Rocky",
+      "extra": [{"name": "search", "isRequired": false}]
+    }
+  ]
+}
