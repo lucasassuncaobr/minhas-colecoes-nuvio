@@ -1,9 +1,6 @@
 const express = require('express');
 const app = express();
 
-// ============================================
-// MANIFEST (Não mexer)
-// ============================================
 const manifest = {
   "id": "com.colecoes.nuvio",
   "name": "Coleções Nuvio",
@@ -16,17 +13,10 @@ const manifest = {
   ]
 };
 
-// ============================================
-// 🎬 ADICIONAR FILMES AQUI
-// ============================================
-// Formato: 'IMDb_ID': { tmdbId: TMDB_ID, name: 'Nome', year: 2024, desc: 'Descrição', collection: 'godfather' ou 'rocky' }
 const movies = {
-  // PODEROSO CHEFÃO
   'tt0068646': { tmdbId: 238, name: 'The Godfather', year: 1972, desc: 'O clássico do crime organizado', collection: 'godfather' },
   'tt0071562': { tmdbId: 239, name: 'The Godfather Part II', year: 1974, desc: 'A continuação épica do saga Corleone', collection: 'godfather' },
   'tt0099674': { tmdbId: 240, name: 'The Godfather Part III', year: 1990, desc: 'O capítulo final da trilogia', collection: 'godfather' },
-  
-  // ROCKY
   'tt0075148': { tmdbId: 519, name: 'Rocky', year: 1976, desc: 'O lutador que subiu do nada', collection: 'rocky' },
   'tt0079817': { tmdbId: 520, name: 'Rocky II', year: 1979, desc: 'Rocky volta ao ringue', collection: 'rocky' },
   'tt0084683': { tmdbId: 521, name: 'Rocky III', year: 1982, desc: 'Rocky enfrenta o Punhador de Aço', collection: 'rocky' },
@@ -38,10 +28,6 @@ const movies = {
   'tt11145118': { tmdbId: 958028, name: 'Creed III', year: 2023, desc: 'Adonis vs seu amigo do passado', collection: 'rocky' },
 };
 
-// ============================================
-// 🖼️ CAPAS TMDB (URLs do TMDB)
-// ============================================
-// Formato: TMDB_ID: 'https://image.tmdb.org/t/p/w500/ARQUIVO.jpg'
 const posters = {
   238: 'https://image.tmdb.org/t/p/w500/6MR0zcRBj1C9R5dCEk8YD6u1H4f.jpg',
   239: 'https://image.tmdb.org/t/p/w500/tHbCWy0OYueC4hxU8KD5789O51V.jpg',
@@ -57,18 +43,10 @@ const posters = {
   958028: 'https://image.tmdb.org/t/p/w500/X8n8Bzt0MHXi2piZGeDVKGmUXcD.jpg',
 };
 
-// ============================================
-// CÓDIGO (Não mexer abaixo)
-// ============================================
 const buildCollections = () => {
   const collections = { godfather: [], rocky: [] };
   Object.entries(movies).forEach(([imdbId, data]) => {
-    collections[data.collection].push({
-      id: imdbId,
-      type: "movie",
-      name: data.name,
-      year: data.year
-    });
+    collections[data.collection].push({ id: imdbId, type: "movie", name: data.name, year: data.year });
   });
   return collections;
 };
@@ -77,46 +55,22 @@ const collections = buildCollections();
 const metaCache = {};
 
 app.get('/', (req, res) => {
-  res.send(`
-    <h1>Coleções Nuvio</h1>
-    <p>Addon para gerenciamento de coleções</p>
-    <p>Manifest: <code>${process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000'}/manifest.json</code></p>
-    <p>⚠️ Aviso: Este addon é de uso privado, sem fins comerciais</p>
-    <p>Desenvolvido por Lucas Assunção</p>
-  `);
+  res.send(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Coleções Nuvio</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;overflow-x:hidden}.hero{position:relative;width:100%;height:100vh;background:#000;overflow:hidden;display:flex;align-items:center;justify-content:center}.hero::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to right,rgba(255,255,255,0.06) 0px,rgba(255,255,255,0.12) 2px,transparent 4px,transparent 120px);filter:blur(1px);opacity:0.6;z-index:1}.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 100%,rgba(255,255,255,0.15),transparent 60%),radial-gradient(ellipse at 50% 100%,rgba(255,255,255,0.12),transparent 70%),radial-gradient(ellipse at 80% 100%,rgba(255,255,255,0.1),transparent 70%);mix-blend-mode:screen;opacity:0.5;z-index:2}.fog{position:absolute;inset:0;background:radial-gradient(circle at 30% 80%,rgba(255,255,255,0.08),transparent 60%),radial-gradient(circle at 70% 85%,rgba(255,255,255,0.06),transparent 65%);filter:blur(20px);opacity:0.4;z-index:3}.floor{position:absolute;bottom:0;width:100%;height:30%;background:linear-gradient(to top,rgba(255,255,255,0.08),transparent);opacity:0.3;z-index:4}.content{position:relative;z-index:10;text-align:center;color:#fff}.content h1{font-size:4rem;font-weight:700;margin-bottom:20px;text-shadow:0 0 30px rgba(255,255,255,0.3);letter-spacing:2px}.content p{font-size:1.2rem;color:rgba(255,255,255,0.8);text-shadow:0 0 20px rgba(255,255,255,0.2)}.status{margin-top:30px;padding:15px 30px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:inline-block;backdrop-filter:blur(10px)}.status-dot{display:inline-block;width:10px;height:10px;background:#00ff00;border-radius:50%;margin-right:10px;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}.status-text{color:rgba(255,255,255,0.9);font-size:0.95rem}.footer{position:absolute;bottom:20px;width:100%;text-align:center;color:rgba(255,255,255,0.5);font-size:0.9rem;z-index:11}.manifest-info{margin-top:40px;font-size:0.85rem;color:rgba(255,255,255,0.6)}.manifest-info code{background:rgba(0,255,0,0.1);border:1px solid rgba(0,255,0,0.3);padding:8px 15px;border-radius:4px;font-family:'Courier New',monospace;color:#00ff00;display:inline-block;margin-top:10px;word-break:break-all}@media (max-width:768px){.content h1{font-size:2.5rem}.content p{font-size:1rem}}</style></head><body><div class="hero"><div class="fog"></div><div class="floor"></div><div class="content"><h1>Coleções Nuvio</h1><p>Addon de Metadados Online</p><div class="status"><span class="status-dot"></span><span class="status-text">Sistema Online</span></div><div class="manifest-info"><p>Manifest disponível em:</p><code>${process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000'}/manifest.json</code></div></div><div class="footer"><p>Desenvolvido por Lucas Assunção | Uso privado, sem fins comerciais</p></div></div></body></html>`);
 });
 
-app.get('/manifest.json', (req, res) => {
-  res.json(manifest);
-});
-
-app.get('/catalog/:type/:id.json', (req, res) => {
-  const coll = collections[req.params.id] || [];
-  res.json({ metas: coll });
-});
-
+app.get('/manifest.json', (req, res) => res.json(manifest));
+app.get('/catalog/:type/:id.json', (req, res) => res.json({ metas: collections[req.params.id] || [] }));
 app.get('/meta/:type/:id.json', (req, res) => {
   const imdbId = req.params.id;
   const movie = movies[imdbId];
-  
   if (!movie) return res.json({ meta: {} });
   if (metaCache[imdbId]) return res.json({ meta: metaCache[imdbId] });
-  
   const posterUrl = posters[movie.tmdbId];
   if (posterUrl) {
-    const meta = {
-      id: imdbId,
-      type: "movie",
-      name: movie.name,
-      year: movie.year,
-      description: movie.desc,
-      poster: posterUrl,
-      background: posterUrl
-    };
+    const meta = { id: imdbId, type: "movie", name: movie.name, year: movie.year, description: movie.desc, poster: posterUrl, background: posterUrl };
     metaCache[imdbId] = meta;
     return res.json({ meta });
   }
-  
   res.json({ meta: {} });
 });
 
