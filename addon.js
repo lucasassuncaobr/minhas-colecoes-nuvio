@@ -52,4 +52,28 @@ const buildCollections = () => {
 };
 
 const collections = buildCollections();
-const 
+const metaCache = {};
+
+app.get('/', (req, res) => {
+  const manifestUrl = process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000';
+  res.send(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Coleções Nuvio</title><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'Roboto',sans-serif;overflow-x:hidden;background:#000}.hero{position:relative;width:100%;height:100vh;background:#000;overflow:hidden;display:flex;align-items:center;justify-content:center}.hero::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to right,rgba(255,255,255,0.06) 0px,rgba(255,255,255,0.12) 2px,transparent 4px,transparent 120px);filter:blur(1px);opacity:0.6;z-index:1}.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 100%,rgba(255,255,255,0.15),transparent 60%),radial-gradient(ellipse at 50% 100%,rgba(255,255,255,0.12),transparent 70%),radial-gradient(ellipse at 80% 100%,rgba(255,255,255,0.1),transparent 70%);mix-blend-mode:screen;opacity:0.5;z-index:2}.fog{position:absolute;inset:0;background:radial-gradient(circle at 30% 80%,rgba(255,255,255,0.08),transparent 60%),radial-gradient(circle at 70% 85%,rgba(255,255,255,0.06),transparent 65%);filter:blur(20px);opacity:0.4;z-index:3}.floor{position:absolute;bottom:0;width:100%;height:30%;background:linear-gradient(to top,rgba(255,255,255,0.08),transparent);opacity:0.3;z-index:4}.content{position:relative;z-index:10;text-align:center;color:#fff}.content h1{font-size:4rem;font-weight:700;margin-bottom:20px;text-shadow:0 0 30px rgba(255,255,255,0.3);letter-spacing:2px}.content p{font-size:1.2rem;color:rgba(255,255,255,0.8);text-shadow:0 0 20px rgba(255,255,255,0.2);font-weight:300}.buttons-container{margin-top:30px;display:flex;flex-direction:column;gap:15px;align-items:center}.status{padding:20px 40px;background:#000;border:2px solid #fff;border-radius:0;display:inline-block;cursor:default}.status-dot{display:inline-block;width:10px;height:10px;background:#fff;border-radius:50%;margin-right:10px;animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}.status-text{color:#fff;font-size:0.95rem;font-weight:500}.copy-btn{padding:20px 40px;background:#fff;border:none;border-radius:0;display:inline-block;cursor:pointer;transition:all 0.3s ease;font-family:'Roboto',sans-serif;font-size:1rem;font-weight:500}.copy-btn:hover{background:#f0f0f0;transform:scale(1.05)}.copy-btn-text{color:#000}.footer{position:absolute;bottom:20px;width:100%;text-align:center;color:rgba(255,255,255,0.5);font-size:0.9rem;z-index:11;font-weight:300}@media (max-width:768px){.content h1{font-size:2.5rem}.content p{font-size:1rem}.buttons-container{flex-direction:column}}</style></head><body><div class="hero"><div class="fog"></div><div class="floor"></div><div class="content"><h1>Coleções Nuvio</h1><p>Addon de Metadados Online</p><div class="buttons-container"><div class="status"><span class="status-dot"></span><span class="status-text">Online</span></div><button class="copy-btn" onclick="navigator.clipboard.writeText('${manifestUrl}/manifest.json');alert('Manifest URL copiado!')"><span class="copy-btn-text">Copiar Manifest</span></button></div></div><div class="footer"><p>Desenvolvido por Lucas Assunção | Uso privado, sem fins comerciais</p></div></div></body></html>`);
+});
+
+app.get('/manifest.json', (req, res) => res.json(manifest));
+app.get('/catalog/:type/:id.json', (req, res) => res.json({ metas: collections[req.params.id] || [] }));
+app.get('/meta/:type/:id.json', (req, res) => {
+  const imdbId = req.params.id;
+  const movie = movies[imdbId];
+  if (!movie) return res.json({ meta: {} });
+  if (metaCache[imdbId]) return res.json({ meta: metaCache[imdbId] });
+  const posterUrl = posters[movie.tmdbId];
+  if (posterUrl) {
+    const meta = { id: imdbId, type: "movie", name: movie.name, year: movie.year, description: movie.desc, poster: posterUrl, background: posterUrl };
+    metaCache[imdbId] = meta;
+    return res.json({ meta });
+  }
+  res.json({ meta: {} });
+});
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Addon Coleções Nuvio rodando em porta ${port}`));
