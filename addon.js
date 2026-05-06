@@ -75,4 +75,4 @@ app.get('/meta/:type/:id.json', (req, res) => {
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`✅ Addon Coleções Nuvio rodando em porta ${port}`));
+app.listen(port, () => console.log(`Addon Coleções Nuvio rodando em porta ${port}`));
