@@ -13,20 +13,20 @@ const manifest = {
   ]
 };
 
-// Mapeamento IMDB -> TMDB (para puxar capas certas)
+// IDs IMDB CORRETOS verificados
 const imdbToTmdb = {
-  'tt0068646': 238,      // The Godfather
-  'tt0071562': 239,      // The Godfather Part II
-  'tt0099674': 240,      // The Godfather Part III
-  'tt0075148': 519,      // Rocky
-  'tt0079817': 520,      // Rocky II
-  'tt0084683': 521,      // Rocky III
-  'tt0089927': 615,      // Rocky IV
-  'tt0100405': 786,      // Rocky V
-  'tt0479143': 8563,     // Rocky Balboa
-  'tt3322380': 337401,   // Creed
-  'tt7916416': 398949,   // Creed II
-  'tt11214590': 958028   // Creed III
+  'tt0068646': 238,      // The Godfather 1972
+  'tt0071562': 239,      // The Godfather Part II 1974
+  'tt0099674': 240,      // The Godfather Part III 1990
+  'tt0075148': 519,      // Rocky 1976
+  'tt0079817': 520,      // Rocky II 1979
+  'tt0084683': 521,      // Rocky III 1982
+  'tt0089927': 615,      // Rocky IV 1985
+  'tt0100405': 786,      // Rocky V 1990
+  'tt0479143': 8563,     // Rocky Balboa 2006
+  'tt3076658': 337401,   // Creed 2015 (CORRETO)
+  'tt4772622': 398949,   // Creed II 2018 (CORRETO)
+  'tt11145118': 958028   // Creed III 2023 (CORRETO)
 };
 
 const collections = {
@@ -42,9 +42,9 @@ const collections = {
     {id: "tt0089927", type: "movie", name: "Rocky IV", year: 1985},
     {id: "tt0100405", type: "movie", name: "Rocky V", year: 1990},
     {id: "tt0479143", type: "movie", name: "Rocky Balboa", year: 2006},
-    {id: "tt3322380", type: "movie", name: "Creed", year: 2015},
-    {id: "tt7916416", type: "movie", name: "Creed II", year: 2018},
-    {id: "tt11214590", type: "movie", name: "Creed III", year: 2023}
+    {id: "tt3076658", type: "movie", name: "Creed", year: 2015},
+    {id: "tt4772622", type: "movie", name: "Creed II", year: 2018},
+    {id: "tt11145118", type: "movie", name: "Creed III", year: 2023}
   ]
 };
 
@@ -60,7 +60,7 @@ const posterData = {
   786: 'https://image.tmdb.org/t/p/w500/KxfVfB1qVYD3OKzHh3Tc3X6LkwN.jpg',
   8563: 'https://image.tmdb.org/t/p/w500/mAjP5ueXhpVkLk6wUVxVyDC8Kj5.jpg',
   337401: 'https://image.tmdb.org/t/p/w500/rwt6H4H4TQY0mAvq6pXGtCB0M5m.jpg',
-  398949: 'https://image.tmdb.org/t/p/w500/v3QyprWZOsXW8drg84CeHkreplies.jpg',
+  398949: 'https://image.tmdb.org/t/p/w500/4jUqvr8wSn9G51Pp60FeywEG9JU.jpg',
   958028: 'https://image.tmdb.org/t/p/w500/X8n8Bzt0MHXi2piZGeDVKGmUXcD.jpg'
 };
 
@@ -76,7 +76,7 @@ app.get('/catalog/:type/:id.json', (req, res) => {
 });
 
 app.get('/meta/:type/:id.json', (req, res) => {
-  const imdbId = req.params.id.replace('tt', '');
+  const imdbId = req.params.id;
   const tmdbId = imdbToTmdb[imdbId];
   
   if (metaCache[imdbId]) {
@@ -85,7 +85,7 @@ app.get('/meta/:type/:id.json', (req, res) => {
   
   if (tmdbId && posterData[tmdbId]) {
     const meta = {
-      id: req.params.id,
+      id: imdbId,
       type: "movie",
       poster: posterData[tmdbId],
       background: posterData[tmdbId]
