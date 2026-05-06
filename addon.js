@@ -1,5 +1,4 @@
 const express = require('express');
-const axios = require('axios');
 const app = express();
 
 const manifest = {
@@ -12,6 +11,22 @@ const manifest = {
     {"type": "movie", "id": "godfather", "name": "Poderoso Chefão"},
     {"type": "movie", "id": "rocky", "name": "Rocky"}
   ]
+};
+
+// Mapeamento IMDB -> TMDB (para puxar capas certas)
+const imdbToTmdb = {
+  'tt0068646': 238,      // The Godfather
+  'tt0071562': 239,      // The Godfather Part II
+  'tt0099674': 240,      // The Godfather Part III
+  'tt0075148': 519,      // Rocky
+  'tt0079817': 520,      // Rocky II
+  'tt0084683': 521,      // Rocky III
+  'tt0089927': 615,      // Rocky IV
+  'tt0100405': 786,      // Rocky V
+  'tt0479143': 8563,     // Rocky Balboa
+  'tt3322380': 337401,   // Creed
+  'tt7916416': 398949,   // Creed II
+  'tt11214590': 958028   // Creed III
 };
 
 const collections = {
@@ -33,20 +48,20 @@ const collections = {
   ]
 };
 
-// Descrições e dados adicionais
-const movieDetails = {
-  'tt0068646': { description: 'O clássico do crime organizado', runtime: 175 },
-  'tt0071562': { description: 'A continuação épica do saga Corleone', runtime: 202 },
-  'tt0099674': { description: 'O capítulo final da trilogia', runtime: 161 },
-  'tt0075148': { description: 'O lutador que subiu do nada', runtime: 120 },
-  'tt0079817': { description: 'Rocky volta ao ringue', runtime: 119 },
-  'tt0084683': { description: 'Rocky enfrenta o Punhador de Aço', runtime: 115 },
-  'tt0089927': { description: 'Rocky vs o Gigante Soviético', runtime: 127 },
-  'tt0100405': { description: 'Rocky treinando uma nova geração', runtime: 115 },
-  'tt0479143': { description: 'Rocky retorna ao ringue após anos', runtime: 102 },
-  'tt3322380': { description: 'O herdeiro do legado de Rocky', runtime: 133 },
-  'tt7916416': { description: 'Adonis enfrenta o filho do inimigo de Rocky', runtime: 130 },
-  'tt11214590': { description: 'Adonis vs seu amigo do passado', runtime: 115 }
+// Capas TMDB verificadas
+const posterData = {
+  238: 'https://image.tmdb.org/t/p/w500/6MR0zcRBj1C9R5dCEk8YD6u1H4f.jpg',
+  239: 'https://image.tmdb.org/t/p/w500/tHbCWy0OYueC4hxU8KD5789O51V.jpg',
+  240: 'https://image.tmdb.org/t/p/w500/cjZGPgw7XTSQF_vwWK7V2cJc0Cz.jpg',
+  519: 'https://image.tmdb.org/t/p/w500/bnlEWsewhQq8MTsHy5gHRJyL4I6.jpg',
+  520: 'https://image.tmdb.org/t/p/w500/xFXKQxXGqKdIXW3YcIDIEaHbNfJ.jpg',
+  521: 'https://image.tmdb.org/t/p/w500/1nMpJRDDaKFHYG5zPVzuRKJQCaV.jpg',
+  615: 'https://image.tmdb.org/t/p/w500/5LiLsEWKDvRnW2QDl8X6PX5RcTz.jpg',
+  786: 'https://image.tmdb.org/t/p/w500/KxfVfB1qVYD3OKzHh3Tc3X6LkwN.jpg',
+  8563: 'https://image.tmdb.org/t/p/w500/mAjP5ueXhpVkLk6wUVxVyDC8Kj5.jpg',
+  337401: 'https://image.tmdb.org/t/p/w500/rwt6H4H4TQY0mAvq6pXGtCB0M5m.jpg',
+  398949: 'https://image.tmdb.org/t/p/w500/v3QyprWZOsXW8drg84CeHkreplies.jpg',
+  958028: 'https://image.tmdb.org/t/p/w500/X8n8Bzt0MHXi2piZGeDVKGmUXcD.jpg'
 };
 
 const metaCache = {};
@@ -60,31 +75,26 @@ app.get('/catalog/:type/:id.json', (req, res) => {
   res.json({ metas: coll });
 });
 
-app.get('/meta/:type/:id.json', async (req, res) => {
-  const id = req.params.id;
+app.get('/meta/:type/:id.json', (req, res) => {
+  const imdbId = req.params.id.replace('tt', '');
+  const tmdbId = imdbToTmdb[imdbId];
   
-  if (metaCache[id]) {
-    return res.json({ meta: metaCache[id] });
+  if (metaCache[imdbId]) {
+    return res.json({ meta: metaCache[imdbId] });
   }
   
-  try {
-    const imdbId = id.replace('imdb:', '').replace('tt', '');
-    const posterUrl = `https://btttr.cc/poster/imdb/poster-default/${imdbId}.jpg?tag=none&lang=pt-BR&rs=IM`;
-    
+  if (tmdbId && posterData[tmdbId]) {
     const meta = {
-      id: id,
+      id: req.params.id,
       type: "movie",
-      description: movieDetails[id]?.description || '',
-      runtime: movieDetails[id]?.runtime || 0,
-      poster: posterUrl,
-      background: posterUrl
+      poster: posterData[tmdbId],
+      background: posterData[tmdbId]
     };
-    
-    metaCache[id] = meta;
-    res.json({ meta });
-  } catch (err) {
-    res.json({ meta: {} });
+    metaCache[imdbId] = meta;
+    return res.json({ meta });
   }
+  
+  res.json({ meta: {} });
 });
 
 const port = process.env.PORT || 3000;
